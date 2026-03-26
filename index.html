@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🍺 Brewery Recipe Guide</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --card: #16213e;
+      --accent: #e94560;
+      --accent2: #f5a623;
+      --text: #eaeaea;
+      --subtext: #a0a0b0;
+      --border: #2a2a4a;
+      --tag-bg: #0f3460;
+      --input-bg: #0f3460;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 0 60px 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+      padding: 40px 20px 30px;
+      text-align: center;
+      border-bottom: 2px solid var(--accent);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      color: var(--accent2);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--subtext);
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+    }
+
+    /* ── CONTROLS ── */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    #searchInput {
+      flex: 1 1 260px;
+      padding: 12px 18px;
+      border-radius: 30px;
+      border: 2px solid var(--accent);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #searchInput:focus { border-color: var(--accent2); }
+    #searchInput::placeholder { color: var(--subtext); }
+
+    .filter-btn {
+      padding: 10px 18px;
+      border-radius: 30px;
+      border: 2px solid var(--border);
+      background: var(--tag-bg);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── SORT ── */
+    #sortSelect {
+      padding: 10px 16px;
+      border-radius: 30px;
+      border: 2px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      text-align: center;
+      color: var(--subtext);
+      font-size: 0.88rem;
+      margin: 16px 0 0;
+    }
+
+    .stats-bar span { color: var(--accent2); font-weight: bold; }
+
+    /* ── GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 22px;
+      max-width: 1200px;
+      margin: 28px auto 0;
+      padding: 0 20px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    .card-header {
+      padding: 18px 20px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .color-swatch {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.15);
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    .card-title { flex: 1; }
+
+    .card-title h2 {
+      font-size: 1.1rem;
+      color: var(--accent2);
+      line-height: 1.2;
+    }
+
+    .card-title .names {
+      font-size: 0.78rem;
+      color: var(--subtext);
+      margin-top: 3px;
+    }
+
+    .category-badge {
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--tag-bg);
+      color: var(--accent2);
+      border: 1px solid var(--accent2);
+      white-space: nowrap;
+    }
+
+    .card-body {
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 16px;
+      flex: 1;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--subtext);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-size: 0.92rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .stat-value.highlight { color: var(--accent2); }
+    .stat-value.danger { color: var(--accent); }
+    .stat-value.good { color: #4caf50; }
+
+    /* Difficulty bar */
+    .diff-bar {
+      display: flex;
+      gap: 3px;
+      margin-top: 3px;
+    }
+
+    .diff-pip {
+      width: 14px;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+    }
+
+    .diff-pip.filled { background: var(--accent2); }
+    .diff-pip.danger { background: var(--accent); }
+
+    /* Alcohol bar */
+    .alc-bar-wrap {
+      grid-column: 1 / -1;
+    }
+
+    .alc-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: var(--border);
+      margin-top: 5px;
+      overflow: hidden;
+    }
+
+    .alc-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+
+    /* Ingredients */
+    .ingredients-section {
+      grid-column: 1 / -1;
+    }
+
+    .ingredient-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .ing-tag {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--tag-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    /* Effects */
+    .effects-section {
+      grid-column: 1 / -1;
+    }
+
+    .effects-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .effect-tag {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: #1a3a1a;
+      color: #7ef07e;
+      border: 1px solid #2a5a2a;
+    }
+
+    .effect-tag.negative {
+      background: #3a1a1a;
+      color: #f07e7e;
+      border-color: #5a2a2a;
+    }
+
+    /* Lore */
+    .lore-section {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--border);
+      padding: 10px 20px 14px;
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--subtext);
+    }
+
+    /* Sober badge */
+    .sober-badge {
+      background: #1a2e3a;
+      color: #7ec8f0;
+      border: 1px solid #2a5a7a;
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    /* No results */
+    .no-results {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--subtext);
+      grid-column: 1 / -1;
+    }
+
+    .no-results .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.5rem; }
+      .card-body { grid-template-columns: 1fr; }
+      .alc-bar-wrap, .ingredients-section, .effects-section { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🍺 Brewery Recipe Guide</h1>
+  <p>Search and filter all available drinks on the server</p>
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="🔍  Search by name or ingredient..." />
+    <select id="sortSelect">
+      <option value="name">Sort: Name</option>
+      <option value="alcohol">Sort: Alcohol ↑</option>
+      <option value="difficulty">Sort: Difficulty ↑</option>
+      <option value="cookingtime">Sort: Cook Time ↑</option>
+    </select>
+    <button class="filter-btn active" data-cat="all">All</button>
+    <button class="filter-btn" data-cat="Beer & Ale">🍺 Beers</button>
+    <button class="filter-btn" data-cat="Wine & Mead">🍷 Wine & Mead</button>
+    <button class="filter-btn" data-cat="Cider & Apple">🍎 Cider</button>
+    <button class="filter-btn" data-cat="Whiskey & Spirits">🥃 Spirits</button>
+    <button class="filter-btn" data-cat="Vodka">🥔 Vodka</button>
+    <button class="filter-btn" data-cat="Gin, Tequila & Absinthe">🌿 Other</button>
+    <button class="filter-btn" data-cat="Non-Alcoholic">☕ Soft</button>
+  </div>
+  <div class="stats-bar">
+    Showing <span id="countDisplay">0</span> drinks
+  </div>
+</header>
+
+<div class="grid" id="recipeGrid"></div>
+
+<script>
+// ── NAMED COLOURS ──────────────────────────────────────────────
+const namedColors = {
+  DARK_RED:     '#8b0000',
+  RED:          '#c0392b',
+  BRIGHT_RED:   '#ff1a1a',
+  ORANGE:       '#e67e22',
+  YELLOW:       '#f1c40f',
+  PINK:         '#ff69b4',
+  PURPLE:       '#8e44ad',
+  BLUE:         '#2980b9',
+  CYAN:         '#1abc9c',
+  WATER:        '#3498db',
+  TEAL:         '#16a085',
+  OLIVE:        '#6b8e23',
+  GREEN:        '#27ae60',
+  LIME:         '#a8ff3e',
+  BLACK:        '#222222',
+  GREY:         '#7f8c8d',
+  BRIGHT_GREY:  '#bdc3c7',
+  WHITE:        '#f0f0f0',
+};
+
+function resolveColor(c) {
+  if (!c) return '#888888';
+  if (namedColors[c.toUpperCase()]) return namedColors[c.toUpperCase()];
+  return '#' + c.replace('#', '');
+}
+
+function alcoholGradient(alc) {
+  if (alc <= 0)  return '#3498db';
+  if (alc <= 10) return '#f1c40f';
+  if (alc <= 20) return '#e67e22';
+  if (alc <= 30) return '#e74c3c';
+  return '#8b0000';
+}
+
+// ── NEGATIVE EFFECTS ──────────────────────────────────────────
+const negativeEffects = [
+  'WEAKNESS','POISON','CONFUSION','BLINDNESS','SLOW','HARM'
+];
+
+function isNegative(eff) {
+  return negativeEffects.some(n => eff.toUpperCase().startsWith(n));
+}
+
+function formatEffect(eff) {
+  // "WATER_BREATHING/1-2/150" → readable
+  const parts = eff.split('/');
+  const name = parts[0].replace(/_/g,' ').toLowerCase()
+    .replace(/\b\w/g, c => c.toUpperCase());
+  return name;
+}
+
+// ── RECIPE DATA ────────────────────────────────────────────────
+const recipes = [
+  {
+    id: 'wheatbeer',
+    names: ['Skunky Wheatbeer','Wheatbeer','Fine Wheatbeer'],
+    ingredients: ['Wheat/3'],
+    cookingtime: 8, distillruns: 0, wood: 'Birch', age: 2,
+    color: 'ffb84d', difficulty: 1, alcohol: 5,
+    lore: ['+++ Refreshing'],
+    category: 'Beer & Ale', effects: []
+  },
+  {
+    id: 'beer',
+    names: ['Skunky Beer','Beer','Fine Beer'],
+    ingredients: ['Wheat/6'],
+    cookingtime: 8, distillruns: 0, wood: 'Any', age: 3,
+    color: 'ffd333', difficulty: 1, alcohol: 6,
+    lore: ['+++ Crisp taste'],
+    category: 'Beer & Ale', effects: []
+  },
+  {
+    id: 'darkbeer',
+    names: ['Skunky Darkbeer','Darkbeer','Fine Darkbeer'],
+    ingredients: ['Wheat/6'],
+    cookingtime: 8, distillruns: 0, wood: 'Dark Oak', age: 8,
+    color: '650013', difficulty: 2, alcohol: 7,
+    lore: ['+++ Roasted taste'],
+    category: 'Beer & Ale', effects: []
+  },
+  {
+    id: 'wine',
+    names: ['Red Wine'],
+    ingredients: ['Sweet Berries/5'],
+    cookingtime: 5, distillruns: 0, wood: 'Any', age: 20,
+    color: 'RED', difficulty: 4, alcohol: 8,
+    lore: ['+ Harsh / Corked','++ Mellow','+++ Full-Bodied'],
+    category: 'Wine & Mead', effects: []
+  },
+  {
+    id: 'mead',
+    names: ['Awkward Mead','Mead','Golden Mead'],
+    ingredients: ['Sugar Cane/6'],
+    cookingtime: 3, distillruns: 0, wood: 'Oak', age: 4,
+    color: 'ORANGE', difficulty: 2, alcohol: 9,
+    lore: ['Has a golden shine'],
+    category: 'Wine & Mead', effects: []
+  },
+  {
+    id: 'ap_mead',
+    names: ['Apple Mead','Sweet Apple Mead','Sweet Golden Apple Mead'],
+    ingredients: ['Sugar Cane/6','Apple/2'],
+    cookingtime: 4, distillruns: 0, wood: 'Oak', age: 4,
+    color: 'ORANGE', difficulty: 4, alcohol: 11,
+    lore: ['Is there any Apple in this?','Refreshing taste of Apple','Sweetest hint of Apple'],
+    category: 'Wine & Mead', effects: ['WATER_BREATHING/1-2/150']
+  },
+  {
+    id: 'cidre',
+    names: ['Poor Cidre','Apple Cider','Great Apple Cider'],
+    ingredients: ['Apple/14'],
+    cookingtime: 7, distillruns: 0, wood: 'Any', age: 3,
+    color: 'f86820', difficulty: 4, alcohol: 7,
+    lore: [],
+    category: 'Cider & Apple', effects: []
+  },
+  {
+    id: 'apple_liquor',
+    names: ['Sour Apple Liquor','Apple Liquor','Calvados'],
+    ingredients: ['Apple/12'],
+    cookingtime: 16, distillruns: 3, wood: 'Acacia', age: 6,
+    color: 'BRIGHT_RED', difficulty: 5, alcohol: 14,
+    lore: ['+ Sour like Acid','+++ Good Apple Liquor'],
+    category: 'Cider & Apple', effects: []
+  },
+  {
+    id: 'whiskey',
+    names: ['Unsightly Whiskey','Whiskey','Scotch Whiskey'],
+    ingredients: ['Wheat/10'],
+    cookingtime: 10, distillruns: 2, distilltime: 50, wood: 'Spruce', age: 18,
+    color: 'ORANGE', difficulty: 7, alcohol: 26,
+    lore: ['Single Malt'],
+    category: 'Whiskey & Spirits', effects: []
+  },
+  {
+    id: 'fire_whiskey',
+    names: ['Powdery Whiskey','Burning Whiskey','Blazing Whiskey'],
+    ingredients: ['Wheat/10','Blaze Powder/2'],
+    cookingtime: 12, distillruns: 3, distilltime: 55, wood: 'Spruce', age: 18,
+    color: 'ORANGE', difficulty: 7, alcohol: 28,
+    lore: ['You get a burning feeling in your mouth'],
+    category: 'Whiskey & Spirits', effects: []
+  },
+  {
+    id: 'rum',
+    names: ['Bitter Rum','Spicy Rum','Golden Rum'],
+    ingredients: ['Sugar Cane/18'],
+    cookingtime: 6, distillruns: 2, distilltime: 30, wood: 'Oak', age: 14,
+    color: 'DARK_RED', difficulty: 6, alcohol: 30,
+    lore: ['+ Too bitter to drink','++ Spiced by the barrel','+++ Spiced Gold'],
+    category: 'Whiskey & Spirits', effects: ['FIRE_RESISTANCE/1/20-100','POISON/1-0/30-0']
+  },
+  {
+    id: 'vodka',
+    names: ['Lousy Vodka','Vodka','Russian Vodka'],
+    ingredients: ['Potato/10'],
+    cookingtime: 15, distillruns: 3, wood: 'None', age: 0,
+    color: 'WHITE', difficulty: 4, alcohol: 20,
+    lore: ['+ Almost undrinkable'],
+    category: 'Vodka', effects: ['WEAKNESS/15','POISON/10']
+  },
+  {
+    id: 'shroom_vodka',
+    names: ['Mushroom Vodka','Mushroom Vodka','Glowing Mushroom Vodka'],
+    ingredients: ['Potato/10','Red Mushroom/3','Brown Mushroom/3'],
+    cookingtime: 18, distillruns: 5, wood: 'None', age: 0,
+    color: 'ff9999', difficulty: 7, alcohol: 18,
+    lore: ['+++Glows in the dark'],
+    category: 'Vodka', effects: ['WEAKNESS/80','CONFUSION/27','NIGHT_VISION/50-80','BLINDNESS/12-2','SLOW/10-3']
+  },
+  {
+    id: 'g_vodka',
+    names: ['Rancid Vodka','Golden Vodka','Shimmering Golden Vodka'],
+    ingredients: ['Potato/10','Gold Nugget/2'],
+    cookingtime: 18, distillruns: 3, wood: 'None', age: 0,
+    color: 'ORANGE', difficulty: 6, alcohol: 20,
+    lore: [],
+    category: 'Vodka', effects: ['WEAKNESS/28','POISON/4']
+  },
+  {
+    id: 'gin',
+    names: ['Pale Gin','Gin','Old Tom Gin'],
+    ingredients: ['Wheat/9','Blue Flowers/6','Apple/1'],
+    cookingtime: 6, distillruns: 2, wood: 'None', age: 0,
+    color: '99ddff', difficulty: 6, alcohol: 20,
+    lore: ['++ With the taste of juniper','+++ Perfectly finished off with juniper'],
+    category: 'Gin, Tequila & Absinthe', effects: []
+  },
+  {
+    id: 'tequila',
+    names: ['Mezcal','Tequila','Tequila Anejo'],
+    ingredients: ['Cactus/8'],
+    cookingtime: 15, distillruns: 2, wood: 'Birch', age: 12,
+    color: 'f5f07e', difficulty: 5, alcohol: 20,
+    lore: ['Desert spirit'],
+    category: 'Gin, Tequila & Absinthe', effects: []
+  },
+  {
+    id: 'absinthe',
+    names: ['Poor Absinthe','Absinthe','Strong Absinthe'],
+    ingredients: ['Grass/15'],
+    cookingtime: 3, distillruns: 6, distilltime: 80, wood: 'None', age: 0,
+    color: 'GREEN', difficulty: 8, alcohol: 42,
+    lore: ['+++ High proof liquor'],
+    category: 'Gin, Tequila & Absinthe', effects: ['POISON/15-25']
+  },
+  {
+    id: 'gr_absinthe',
+    names: ['Poor Absinthe','Green Absinthe','Bright Green Absinthe'],
+    ingredients: ['Grass/17','Poisonous Potato/2'],
+    cookingtime: 5, distillruns: 6, distilltime: 85, wood: 'None', age: 0,
+    color: 'LIME', difficulty: 9, alcohol: 46,
+    lore: ['Looks poisonous'],
+    category: 'Gin, Tequila & Absinthe', effects: ['POISON/25-40','HARM/2','NIGHT_VISION/40-60']
+  },
+  {
+    id: 'potato_soup',
+    names: ['Potato Soup'],
+    ingredients: ['Potato/5','Grass/3'],
+    cookingtime: 3, distillruns: 0, wood: 'None', age: 0,
+    color: 'ORANGE', difficulty: 1, alcohol: 0,
+    lore: [],
+    category: 'Non-Alcoholic', effects: ['HEAL/0-1']
+  },
+  {
+    id: 'coffee',
+    names: ['Stale Coffee','Coffee','Strong Coffee'],
+    ingredients: ['Cocoa Beans/12','Milk Bucket/2'],
+    cookingtime: 2, distillruns: 0, wood: 'None', age: 0,
+    color: 'BLACK', difficulty: 3, alcohol: -6,
+    lore: ['+ Probably a week old'],
+    category: 'Non-Alcoholic', effects: ['REGENERATION/1/2-5','SPEED/1/30-140']
+  },
+  {
+    id: 'eggnog',
+    names: ['Egg Liquor','Eggnog','Advocaat'],
+    ingredients: ['Egg/5','Sugar/2','Milk Bucket/1'],
+    cookingtime: 2, distillruns: 0, wood: 'Any', age: 3,
+    color: 'ffe680', difficulty: 4, alcohol: 10,
+    lore: ['Made with raw egg'],
+    category: 'Non-Alcoholic', effects: []
+  },
+  {
+    id: 'g_vodka2',
+    names: ['Rancid Vodka','Golden Vodka','Shimmering Golden Vodka'],
+    ingredients: ['Potato/10','Gold Nugget/2'],
+    cookingtime: 18, distillruns: 3, wood: 'None', age: 0,
+    color: 'ORANGE', difficulty: 6, alcohol: 20,
+    lore: [],
+    category: 'Vodka', effects: ['WEAKNESS/28','POISON/4']
+  },
+  {
+    id: 'hot_choc',
+    names: ['Hot Chocolate'],
+    ingredients: ['Cookie/3'],
+    cookingtime: 2, distillruns: 0, wood: 'None', age: 0,
+    color: 'DARK_RED', difficulty: 2, alcohol: 0,
+    lore: [],
+    category: 'Non-Alcoholic', effects: ['FAST_DIGGING/40']
+  },
+  {
+    id: 'iced_coffee',
+    names: ['Watery Coffee','Iced Coffee','Strong Iced Coffee'],
+    ingredients: ['Cookie/8','Snowball/4','Milk Bucket/1'],
+    cookingtime: 1, distillruns: 0, wood: 'None', age: 0,
+    color: 'BLACK', difficulty: 4, alcohol: -8,
+    lore: [],
+    category: 'Non-Alcoholic', effects: ['REGENERATION/30','SPEED/10']
+  },
+];
+
+// deduplicate (g_vodka appears twice in source)
+const seen = new Set();
+const uniqueRecipes = recipes.filter(r => {
+  if (seen.has(r.id)) return false;
+  seen.add(r.id);
+  return true;
+});
+
+// ── RENDER ────────────────────────────────────────────────────
+function buildCard(r) {
+  const color    = resolveColor(r.color);
+  const alcPct   = Math.min(Math.max(r.alcohol, 0), 100);
+  const alcColor = alcoholGradient(r.alcohol);
+  const bestName = r.names[r.names.length - 1];
+
+  // difficulty pips
+  let pips = '';
+  for (let i = 1; i <= 10; i++) {
+    const filled = i <= r.difficulty;
+    const danger = filled && r.difficulty >= 7;
+    pips += `<div class="diff-pip ${filled ? (danger ? 'danger' : 'filled') : ''}"></div>`;
+  }
+
+  // ingredients
+  const ings = r.ingredients.map(ing => {
+    const [item, amt] = ing.split('/');
+    return `<span class="ing-tag">${item} ×${amt}</span>`;
+  }).join('');
+
+  // effects
+  let effectsHtml = '';
+  if (r.effects && r.effects.length) {
+    const tags = r.effects.map(e => {
+      const neg = isNegative(e);
+      const label = formatEffect(e);
+      return `<span class="effect-tag ${neg ? 'negative' : ''}">${label}</span>`;
+    }).join('');
+    effectsHtml = `
+      <div class="stat effects-section">
+        <div class="stat-label">⚗️ Effects</div>
+        <div class="effects-tags">${tags}</div>
+      </div>`;
+  }
+
+  // alcohol display
+  let alcDisplay = '';
+  if (r.alcohol < 0) {
+    alcDisplay = `<span class="sober-badge">🧠 Sobers you up (${r.alcohol})</span>`;
+  } else if (r.alcohol === 0) {
+    alcDisplay = `<span class="stat-value good">None</span>`;
+  } else {
+    alcDisplay = `
+      <span class="stat-value ${r.alcohol >= 30 ? 'danger' : 'highlight'}">${r.alcohol}/100</span>
+      <div class="alc-bar">
+        <div class="alc-fill" style="width:${alcPct}%;background:${alcColor}"></div>
+      </div>`;
+  }
+
+  // lore
+  const loreHtml = r.lore && r.lore.length
+    ? `<div class="lore-section">💬 ${r.lore.join(' &nbsp;·&nbsp; ')}</div>`
+    : '';
+
+  // distill info
+  const distillVal = r.distillruns === 0
+    ? 'None'
+    : `${r.distillruns}× ${r.distilltime ? `(${r.distilltime}s each)` : ''}`;
+
+  return `
+    <div class="card" data-category="${r.category}" data-search="${[...r.names,...r.ingredients].join(' ').toLowerCase()}">
+      <div class="card-header">
+        <div class="color-swatch" style="background:${color}"></div>
+        <div class="card-title">
+          <h2>${bestName}</h2>
+          ${r.names.length > 1
+            ? `<div class="names">👎 ${r.names[0]} &nbsp;/&nbsp; 👍 ${r.names[r.names.length-1]}</div>`
+            : ''}
+        </div>
+        <span class="category-badge">${r.category}</span>
+      </div>
+      <div class="card-body">
+
+        <div class="stat ingredients-section">
+          <div class="stat-label">🧪 Ingredients</div>
+          <div class="ingredient-tags">${ings}</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">🔥 Cook Time</div>
+          <div class="stat-value">${r.cookingtime} min</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">⚗️ Distill</div>
+          <div class="stat-value">${distillVal}</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">🪵 Barrel Wood</div>
+          <div class="stat-value">${r.wood}</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">📅 Aging</div>
+          <div class="stat-value">${r.age > 0 ? r.age + ' years' : 'None'}</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">🎯 Difficulty</div>
+          <div class="diff-bar">${pips}</div>
+        </div>
+
+        <div class="stat alc-bar-wrap">
+          <div class="stat-label">🍻 Alcohol</div>
+          ${alcDisplay}
+        </div>
+
+        ${effectsHtml}
+      </div>
+      ${loreHtml}
+    </div>`;
+}
+
+// ── FILTER & SORT ─────────────────────────────────────────────
+let activeCategory = 'all';
+let activeSearch   = '';
+let activeSort     = 'name';
+
+function render() {
+  let list = [...uniqueRecipes];
+
+  if (activeCategory !== 'all') {
+    list = list.filter(r => r.category === activeCategory);
+  }
+
+  if (activeSearch) {
+    const q = activeSearch.toLowerCase();
+    list = list.filter(r =>
+      r.names.some(n => n.toLowerCase().includes(q)) ||
+      r.ingredients.some(i => i.toLowerCase().includes(q)) ||
+      r.category.toLowerCase().includes(q)
+    );
+  }
+
+  if (activeSort === 'alcohol') {
+    list.sort((a, b) => a.alcohol - b.alcohol);
+  } else if (activeSort === 'difficulty') {
+    list.sort((a, b) => a.difficulty - b.difficulty);
+  } else if (activeSort === 'cookingtime') {
+    list.sort((a, b) => a.cookingtime - b.cookingtime);
+  } else {
+    list.sort((a, b) => a.names[a.names.length-1].localeCompare(b.names[b.names.length-1]));
+  }
+
+  const grid = document.getElementById('recipeGrid');
+  document.getElementById('countDisplay').textContent = list.length;
+
+  if (list.length === 0) {
+    grid.innerHTML = `
+      <div class="no-results">
+        <span class="emoji">🔍</span>
+        No drinks match your search. Try something else!
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(buildCard).join('');
+}
+
+// ── EVENTS ────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', e => {
+  activeSearch = e.target.value;
+  render();
+});
+
+document.getElementById('sortSelect').addEventListener('change', e => {
+  activeSort = e.target.value;
+  render();
+});
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory = btn.dataset.cat;
+    render();
+  });
+});
+
+// ── INIT ──────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
