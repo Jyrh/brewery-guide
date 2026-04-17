@@ -618,7 +618,7 @@ const recipes = [
     cookingtime: 2, distillruns: 0, wood: 'Any', age: 3,
     color: 'ffe680', difficulty: 4, alcohol: 10,
     lore: ['Made with raw egg'],
-    category: 'Non-Alcoholic', effects: []
+    category: 'Spirits', effects: []
   },
   {
     id: 'g_vodka2',
@@ -644,6 +644,69 @@ const recipes = [
     ingredients: ['Cookie/8','Snowball/4','Milk Bucket/1'],
     cookingtime: 1, distillruns: 0, wood: 'None', age: 0,
     color: 'BLACK', difficulty: 4, alcohol: -8,
+    lore: [],
+    category: 'Non-Alcoholic', effects: ['REGENERATION/30','SPEED/10']
+  },
+  {
+    id: 'wheatbeer',
+    names: ['Skunky Wheatbeer','Wheatbeer','Fine Wheatbeer'],
+    ingredients: ['Wheat/3'],
+    cookingtime: 8, distillruns: 0, wood: 'Birch', age: 2,
+    color: 'ffb84d', difficulty: 1, alcohol: 5,
+    lore: ['+++ Refreshing'],
+    category: 'Beer', effects: []
+  },
+  {
+    id: 'darkbeer',
+    names: ['Skunky Darkbeer','Darkbeer','Fine Darkbeer'],
+    ingredients: ['Wheat/6'],
+    cookingtime: 8, distillruns: 0, wood: 'Dark Oak', age: 8,
+    color: '650013', difficulty: 2, alcohol: 7,
+    lore: ['+++ Roasted taste'],
+    category: 'Beer', effects: []
+  },
+  {
+    id: 'apple_liquor',
+    names: ['Sour Apple Liquor','Apple Liquor','Calvados'],
+    ingredients: ['Apple/12'],
+    cookingtime: 16, distillruns: 3, wood: 'Acacia', age: 6,
+    color: 'BRIGHT_RED', difficulty: 5, alcohol: 14,
+    lore: ['+ Sour like Acid','+++ Good Apple Liquor'],
+    category: 'Spirits', effects: []
+  },
+  {
+    id: 'shroom_vodka',
+    names: ['Mushroom Vodka','Mushroom Vodka','Glowing Mushroom Vodka'],
+    ingredients: ['Potato/10','Red Mushroom/3','Brown Mushroom/3'],
+    cookingtime: 18, distillruns: 5, wood: 'None', age: 0,
+    color: 'ff9999', difficulty: 7, alcohol: 18,
+    lore: ['+++ Glows in the dark'],
+    category: 'Vodka', effects: ['WEAKNESS/80','NAUSEA/27','NIGHT_VISION/50-80','BLINDNESS/12-2']
+  },
+  {
+    id: 'fire_whiskey',
+    names: ['Powdery Whiskey','Burning Whiskey','Blazing Whiskey'],
+    ingredients: ['Wheat/10','Blaze Powder/2'],
+    cookingtime: 12, distillruns: 3, wood: 'Spruce', age: 18,
+    color: 'ORANGE', difficulty: 7, alcohol: 28,
+    lore: ['You get a burning feeling in your mouth'],
+    category: 'Whiskey', effects: []
+  },
+  {
+    id: 'tea',
+    names: ['Watery Tea','Tea','Strong Tea'],
+    ingredients: ['Dandelion/4','Azure Bluet/2'],
+    cookingtime: 3, distillruns: 0, wood: 'None', age: 0,
+    color: 'BLACK', difficulty: 4, alcohol: -10,
+    lore: [],
+    category: 'Non-Alcoholic', effects: ['REGENERATION/30','SPEED/10']
+  },
+  {
+    id: 'milky_tea',
+    names: ['Weak Milky Tea','Milky Tea','Strong Milky Tea'],
+    ingredients: ['Dandelion/4','Azure Bluet/2','Milk Bucket/1'],
+    cookingtime: 3, distillruns: 0, wood: 'None', age: 0,
+    color: '91673a', difficulty: 4, alcohol: -10,
     lore: [],
     category: 'Non-Alcoholic', effects: ['REGENERATION/30','SPEED/10']
   },
